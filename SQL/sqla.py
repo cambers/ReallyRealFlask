@@ -43,3 +43,8 @@ with sqlite3.connect('new.db') as conn:
 
     #close the connection w/ the connection object = conn
    # conn.close()
+
+
+
+
+
