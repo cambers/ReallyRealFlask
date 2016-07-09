@@ -1,17 +1,29 @@
-#Create a sqlite3 db and table
-
 import sqlite3
 
-#create a db
-conn = sqlite3.connect('new.db')
+#Only use single quotes around strings
 
-#create a cursor object to execute SQL commands
-cursor = conn.cursor()
+'''
+$python sql.py
+$sqlite3 sample.db
+>select * from posts;
+>
+>insert into posts values('hey','baby');
 
-#create a table
-cursor.execute("""CREATE TABLE population(city TEXT, state TEXT, population INT)""")
+--To erase the table in the script:
+    c.execute("""DROP TABLE posts""")
+    '''
 
-#close the connection
-conn.close()
+
+
+#create a db 
+with sqlite3.connect('new.db') as conn:
+    #Create cursor object to execute SQL commands
+    c = conn.cursor()
+    #Create a db table with 3 field/rows
+    #Don't use three quotes in a row aka """ """
+    c.execute(" CREATE TABLE population (name TEXT, age TEXT, population INTEGER)")
+    #conn.commit()   < not necessary if u use the 'with' statement
+    conn.close()
+
 
 
