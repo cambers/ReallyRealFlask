@@ -1,5 +1,6 @@
 import sqlite3
 
+#Dont use \n in statements, only (""" statement """)
 #Only use single quotes around strings
 
 '''

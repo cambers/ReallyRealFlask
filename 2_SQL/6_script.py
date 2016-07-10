@@ -1,23 +1,26 @@
-#use UPDATE and DELETE statement
-
 import sqlite3
 
 with sqlite3.connect('newbie.db') as conn:
     c = conn.cursor()
 
-#update data
-c.execute("UPDATE population SET population = 9000000 WHERE state='TX'")
+    
 
-#delete data
-c.execute("DELETE FROM population WHERE city='Housten'")
+    cities = [
+            ('Atlanta','GA',200),
+            ('Macon','GA',200),
+            ('Dawson','GA',400)
+            ]
 
-print "\nNEW DATA:\n"
+    c.executemany("INSERT INTO population VALUES(?,?,?)", cities)
+    
+    c.execute("DELETE FROM population WHERE city = 'Annaheim'")
+    c.execute("UPDATE population SET city = 'Greenville' WHERE state = 'CA'")
+    try:
+        c.execute("SELECT * from population")
 
-c.execute("SELECT * FROM population")
-
-rows = c.fetchall()
-
-for r in rows:
-    print r[0],r[1],r[2]
-
+        rows = c.fetchall()
+        for r in rows:
+            print r[0],r[1],r[2]
+    except sqlite3.OperationalError:
+        print 'Try again silly beans'
 
