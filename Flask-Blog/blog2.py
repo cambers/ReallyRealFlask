@@ -1,18 +1,15 @@
-from flask import Flask, render_template, request, session,\
-        flash, redirect, url_for, g
+from flask import Flask, redirect, request, url_for, render_template, session, g, flash
 from functools import wraps
 import sqlite3
 
+app = Flask(__name__)
 
-#configuration
+#config
 DATABASE = 'blog.db'
 USERNAME = 'admin'
 PASSWORD = 'admin'
-SECRET_KEY = '\x9f\xa2\x1d2\x83]3\x19\xc7N\xf48|\x8c\xea3h\x93DA\xba\x97\x91\x04'
+SECRET_KEY = 'L\xff\x8e3\xd8pS\x0b\xa3\x12\x1e4j\x11|\xd8\xfa\xfel\xb1\xee\x87\x05\x94'
 
-app = Flask(__name__)
-
-#pulls in app configuration by looking for UPPERCASE variables
 app.config.from_object(__name__)
 
 def connect_db():
@@ -24,10 +21,9 @@ def login_required(test):
         if 'logged_in' in session:
             return test(*args, **kwargs)
         else:
-            flash('You need to login first')
+            flash('You must login first')
             return redirect(url_for('login'))
     return wrap
-
 
 @app.route('/', methods = ['GET','POST'])
 def login():
@@ -35,50 +31,27 @@ def login():
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME'] or \
                 request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid credentials. Please try again.'
+            error = 'Invalid Credentials'
         else:
             session['logged_in'] = True
             return redirect(url_for('main'))
     return render_template('login.html', error=error)
-
-
 
 @app.route('/main')
 @login_required
 def main():
     g.db = connect_db()
     cur = g.db.execute('select * from posts')
-    #put db data into a dictionay
     posts = [dict(title=row[0], post=row[1]) for row in cur.fetchall()]
     g.db.close()
-    #posts=posts refers to the main template 
     return render_template('main.html', posts=posts)
-
-@app.route('/add', methods = ['POST'])
-@login_required
-def add():
-    title = request.form['title']
-    post = request.form['post']
-    if not title or not post:
-        flash("All fields are required. Please try again.")
-        return redirect(url_for('main'))
-    else:
-        g.db = connect_db()
-        #I got an error of 3 arguments w/ no [], so if u use [] around title,post then its only considered one argument.
-        g.db.execute('insert into posts values (?,?)', [title, post])
-        g.db.commit()
-        g.db.close()
-        flash('New entry was successfully posted!')
-    return redirect(url_for('main'))
-
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    flash('You were just logged out')
+    flash('You are logged out')
     return redirect(url_for('login'))
 
 
 if __name__=='__main__':
     app.run(debug=True)
-
